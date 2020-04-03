@@ -19,8 +19,7 @@ import lombok.Getter;
 @Builder
 @EqualsAndHashCode
 @Getter
-public class Transaction implements Comparable<Transaction>
-{
+public class Transaction implements Comparable<Transaction> {
     @ApiModelProperty(value = "Amount of the transaction parseable as BigDecimal")
     private BigDecimal amount;
 
@@ -28,21 +27,17 @@ public class Transaction implements Comparable<Transaction>
     @JsonDeserialize(using = TimestampDeserializer.class)
     private long timestamp;
 
-    public Transaction()
-    {}
+    public Transaction() {
+    }
 
-
-    public Transaction(BigDecimal amount, long timestamp)
-    {
+    public Transaction(BigDecimal amount, long timestamp) {
         super();
         this.amount = amount;
         this.timestamp = timestamp;
     }
 
-
     @Override
-    public int compareTo(Transaction tx)
-    {
+    public int compareTo(Transaction tx) {
         if (timestamp > tx.getTimestamp())
             return 1;
         else if (timestamp == tx.getTimestamp())
@@ -50,21 +45,18 @@ public class Transaction implements Comparable<Transaction>
         return -1;
     }
 
-
-    public boolean isDisposable()
-    {
+    public boolean isDisposable() {
         return (Duration.between(Instant.ofEpochMilli(timestamp), Instant.now()).toMillis() > 59999);
     }
 
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         String dateFormatted = formatter.format(new Date(timestamp));
 
-        return "Transaction [amount=" + amount + ", timestamp=" + dateFormatted + "]\n";
+        return dateFormatted + "\n";
     }
 
 }

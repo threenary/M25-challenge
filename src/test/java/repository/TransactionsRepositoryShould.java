@@ -17,28 +17,30 @@ import org.junit.Test;
 import com.n26.repository.TransactionsRepository;
 import com.n26.transaction.Transaction;
 
-public class TransactionsRepositoryShould
-{
+public class TransactionsRepositoryShould {
 
     TransactionsRepository testSubject = new TransactionsRepository();
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         testSubject.removeAll();
     }
 
 
     @Test
-    public void store_new_transactions_in_timestamp_order()
-    {
-        Transaction tx1 = Transaction.builder().timestamp(Instant.now().toEpochMilli()).amount(new BigDecimal("1")).build();
-        Transaction tx2 = Transaction.builder().timestamp(Instant.now().minus(10, ChronoUnit.SECONDS).toEpochMilli()).amount(new BigDecimal("2")).build();
-        Transaction tx3 = Transaction.builder().timestamp(Instant.now().minus(20, ChronoUnit.SECONDS).toEpochMilli()).amount(new BigDecimal("3")).build();
-
-        testSubject.save(tx1);
-        testSubject.save(tx2);
+    public void store_new_transactions_in_timestamp_order() {
+        Transaction tx3 = Transaction.builder().timestamp(Instant.now().minus(20, ChronoUnit.SECONDS).toEpochMilli())
+                .amount(new BigDecimal("3")).build();
         testSubject.save(tx3);
+
+        Transaction tx1 = Transaction.builder().timestamp(Instant.now().toEpochMilli())
+                .amount(new BigDecimal("1")).build();
+        testSubject.save(tx1);
+
+        Transaction tx2 = Transaction.builder().timestamp(Instant.now().minus(10, ChronoUnit.SECONDS).toEpochMilli())
+                .amount(new BigDecimal("2")).build();
+        testSubject.save(tx2);
+
 
         assertThat(testSubject.getTransactions().size(), is(equalTo(3)));
         assertEquals(tx3, testSubject.getTransactions().poll());
@@ -49,10 +51,8 @@ public class TransactionsRepositoryShould
 
 
     @Test
-    public void retrieve_all_stored_transactions()
-    {
-        for (int i = 0; i < 5; i++)
-        {
+    public void retrieve_all_stored_transactions() {
+        for (int i = 0; i < 5; i++) {
             testSubject.save(Transaction.builder().timestamp(Instant.now().toEpochMilli()).amount(new BigDecimal("55")).build());
         }
 
@@ -61,8 +61,7 @@ public class TransactionsRepositoryShould
 
 
     @Test
-    public void delete_all_transactions()
-    {
+    public void delete_all_transactions() {
         testSubject.removeAll();
 
         assertThat(testSubject.getTransactions().size(), is(equalTo(0)));
@@ -70,12 +69,11 @@ public class TransactionsRepositoryShould
 
 
     @Test
-    public void remove_older_than_60_seconds_when_newer_is_added()
-    {
+    public void remove_older_than_60_seconds_when_newer_is_added() {
         Transaction older =
-            Transaction
-                .builder().timestamp(Instant.now().minus(80, ChronoUnit.SECONDS).toEpochMilli())
-                .amount(new BigDecimal("55")).build();
+                Transaction
+                        .builder().timestamp(Instant.now().minus(80, ChronoUnit.SECONDS).toEpochMilli())
+                        .amount(new BigDecimal("55")).build();
         testSubject.save(older);
 
         Transaction newer = Transaction.builder().timestamp(Instant.now().toEpochMilli()).amount(new BigDecimal("55")).build();
@@ -87,18 +85,17 @@ public class TransactionsRepositoryShould
 
 
     @Test
-    public void dispose_transactions_older_than_60_seconds()
-    {
+    public void dispose_transactions_older_than_60_seconds() {
         Transaction tx80 =
-            Transaction
-                .builder().timestamp(Instant.now().minus(80, ChronoUnit.SECONDS).toEpochMilli())
-                .amount(new BigDecimal("80")).build();
+                Transaction
+                        .builder().timestamp(Instant.now().minus(80, ChronoUnit.SECONDS).toEpochMilli())
+                        .amount(new BigDecimal("80")).build();
         testSubject.save(tx80);
 
         Transaction tx70 =
-            Transaction
-                .builder().timestamp(Instant.now().minus(70, ChronoUnit.SECONDS).toEpochMilli())
-                .amount(new BigDecimal("70")).build();
+                Transaction
+                        .builder().timestamp(Instant.now().minus(70, ChronoUnit.SECONDS).toEpochMilli())
+                        .amount(new BigDecimal("70")).build();
         testSubject.save(tx70);
 
         Transaction should_remain = Transaction.builder().timestamp(Instant.now().toEpochMilli()).amount(new BigDecimal("1")).build();

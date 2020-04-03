@@ -23,32 +23,25 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping(path = "/transactions")
-public class TransactionResource
-{
-
+public class TransactionResource {
+    public static final int TIME_TO_LIVE = 59999;
     private final TransactionsRepository repository;
-
 
     @ApiOperation(value = "", nickname = "transactionPost", notes = "Posts a transaction")
     @ApiResponses(
-        value = {
-            @ApiResponse(code = 201, message = "Transaction created"),
-            @ApiResponse(code = 204, message = "Transaction older than 60 seconds"),
-            @ApiResponse(code = 400, message = "No valid JSON format"),
-            @ApiResponse(code = 422, message = "Data not parseable")})
+            value = {
+                    @ApiResponse(code = 201, message = "Transaction created"),
+                    @ApiResponse(code = 204, message = "Transaction older than 60 seconds"),
+                    @ApiResponse(code = 400, message = "No valid JSON format"),
+                    @ApiResponse(code = 422, message = "Data not parseable")})
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<String> postTransaction(@RequestBody Transaction transaction) throws Exception
-    {
-
-        if (Instant.now().toEpochMilli() - transaction.getTimestamp() > 60000)
-        {
+    public ResponseEntity<String> postTransaction(@RequestBody Transaction transaction) throws Exception {
+        if (Instant.now().toEpochMilli() - transaction.getTimestamp() > TIME_TO_LIVE) {
             throw new TransactionOutdatedException(TransactionsStatisticsError.TRANSACTION_OUTDATED);
         }
-        if (transaction.getTimestamp() > Instant.now().toEpochMilli())
-        {
+        if (transaction.getTimestamp() > Instant.now().toEpochMilli()) {
             throw new UnprocessableEntityException(TransactionsStatisticsError.TRANSACTION_IN_THE_FUTURE);
         }
-
         repository.save(transaction);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -57,8 +50,7 @@ public class TransactionResource
     @ApiOperation(value = "", nickname = "transactionsDelete", notes = "Deletes all the transactions")
     @ApiResponses(value = {@ApiResponse(code = 204, message = "Removed all transactions")})
     @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteTransaction()
-    {
+    public ResponseEntity<String> deleteTransaction() {
         repository.removeAll();
         return ResponseEntity.status(HttpStatus.OK).build();
     }

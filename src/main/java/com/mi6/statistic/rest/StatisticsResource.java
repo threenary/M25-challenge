@@ -22,7 +22,6 @@ public class StatisticsResource
 
     final TransactionsRepository repository;
 
-
     @ApiOperation(value = "", nickname = "statisticsGet", notes = "Gets the transactions statistics for the last 60 seconds")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed all transactions")})
     @RequestMapping(method = RequestMethod.GET)
