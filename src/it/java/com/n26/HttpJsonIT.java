@@ -83,9 +83,6 @@ public class HttpJsonIT {
         mockMvc = webAppContextSetup(webApplicationContext).build();
         assertNotNull(mockMvc);
     }
-    
-    @Autowired
-    private TransactionsRepository repository;
 
     @Autowired
     public void setConverters(HttpMessageConverter<?>[] converters) {
@@ -168,7 +165,6 @@ public class HttpJsonIT {
 
                         JsonNode jsonObject = parseJson(jsonString);
                         if (jsonObject.has("sleep")) {
-                            System.out.println(repository.getTransactions());
                             executeSleep(jsonObject);
                         } else {
                             executeTestRequest(jsonObject, filename, processedRequestCount);
